@@ -10,19 +10,20 @@
  */
 function transformStateWithClones(state, actions) {
   const result = [];
+  const stateCopy = { ...state };
 
   for (const action of actions) {
     switch (action.type) {
       case 'addProperties':
-        result.push(addProperties(state, action.extraData));
+        result.push(addProperties(stateCopy, action.extraData));
         break;
 
       case 'removeProperties':
-        result.push(removeProperties(state, action.keysToRemove));
+        result.push(removeProperties(stateCopy, action.keysToRemove));
         break;
 
       case 'clear':
-        result.push(clear(state));
+        result.push(clear(stateCopy));
         break;
     }
   }
@@ -30,38 +31,34 @@ function transformStateWithClones(state, actions) {
   return result;
 }
 
-function addProperties(state, extraData) {
-  const stateA = {};
+function addProperties(stateCopy, extraData) {
+  Object.assign(stateCopy, extraData);
 
-  Object.assign(stateA, state, extraData);
+  let stateA = {}; /* №1 */
+
+  stateA = { ...stateCopy };
 
   return stateA;
 }
 
-function removeProperties(state, keysToRemove) {
-  /* const stateB = {};
-
+function removeProperties(stateCopy, keysToRemove) {
   for (const key of keysToRemove) {
-    delete state[key];
+    delete stateCopy[key];
   }
 
-  Object.assign(stateB, state);
-
-  return stateB; */
-
-  const stateB = { ...state };
-
-  for (const key of keysToRemove) {
-    delete stateB[key];
-  }
+  const stateB = { ...stateCopy };
 
   return stateB;
 }
 
-function clear(state) {
-  const emptyObject = {};
+function clear(stateCopy) {
+  for (const cler in stateCopy) {
+    delete stateCopy[cler];
+  }
 
-  return emptyObject;
+  const stateCopyB = {};
+
+  return stateCopyB;
 }
 
 module.exports = transformStateWithClones;
